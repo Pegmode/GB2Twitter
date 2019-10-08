@@ -1,4 +1,4 @@
-;GB2Twitter ROM by Pegmode
+;GB2Twitter ROM by Daniel Chu (Pegmode)
 ;Thanks to DevEd for some code
 
 ;Constant Includes (DO NOT ADD CODE)
@@ -31,14 +31,14 @@ debug1:
 
 loadInitPage:
 	;load text tiles
-	
+
 	ld hl,TextTiles ;source
 	ld de,$8000+16;memory adr, every tile takes up 16 bytes
 	ld c,$FF
 	call VRamCopyLoop;load first word of text tiles
 	ld c,161
 	call VRamCopyLoop;load second word of text tiles
-	
+
 	;line one text
 	ld hl,initText1
 	ld de,_SCRN0
@@ -54,8 +54,8 @@ loadInitPage:
 	ld hl,bottomText2
 	ld de,_SCRN0 + $20*$11
 	call FillASCIIMap
-	
-	
+
+
 .waitForInitialInput
 	call ReadJoy
 	ld a,[OldJoyData]
@@ -68,8 +68,8 @@ loadInitPage:
 main:
 	ld a,[rSC]
 	and 1
-	cp 1;check if in master mode 
-	jp nz,.notMaster;if not in master mode jp 
+	cp 1;check if in master mode
+	jp nz,.notMaster;if not in master mode jp
 	call ReadJoy
 	ld a,[OldJoyData]
 	cp $8;check for start button
@@ -78,7 +78,7 @@ main:
 	nop
 .exit
 	jp main
-	
+
 startTransfer:;as master start transfer
 	;clear old
 	ld hl,_SCRN0 + $20*4
@@ -88,7 +88,7 @@ startTransfer:;as master start transfer
 	ld hl,masterTextTransfer
 	ld de,_SCRN0 + $20*4
 	call FillASCIIMap
-	ld a,%10000001 
+	ld a,%10000001
 	ld [rSC],a;START TRANSFER!
 .checkTransfer
 	ld a,[rSC]
@@ -104,7 +104,7 @@ startTransfer:;as master start transfer
 	ld de,_SCRN0 + $20*4
 	call FillASCIIMap
 	jp main
-	
+
 setMaster:
 	ld a,1
 	ld [rSC],a;set GB to master
@@ -123,7 +123,7 @@ setMaster:
 	ld de,_SCRN0 + $20*4
 	call FillASCIIMap
 	jp main
-	
+
 setSlave:
 	ld a,%10000000
 	ld [rSC],a;set GB to Slave
@@ -141,11 +141,14 @@ setSlave:
 	ld hl,slaveText2
 	ld de,_SCRN0 + $20*4
 	call FillASCIIMap
-	;ld a,%00000100 ;set interupt 
+	;ld a,%00000100 ;set interupt
 	;ld [rIF],a
 	;ei
 	jp main
-	
+
+printCurrentSerial:
+
+
 ;ASCII2tile
 ;=====================================
 ;hl = input text address, de = destination
@@ -154,7 +157,7 @@ FillASCIIMap:
 	ld b,32
 .l1
 	ld a,[hl+]
-	cp $00
+	cp $00 ;null termination char
 	jr z,.exit ;test if current ascii is the null termination character (0)
 
 	sub 32;convert to "A" table index positions
@@ -174,7 +177,13 @@ FillASCIIMap:
 .exit
 	pop bc
 	ret
-	
+
+;printAt
+;=========================================
+;hl = input text address,
+printAt:
+
+
 ;INTERUPTS
 ;===================================================
 serialInt:
@@ -192,17 +201,17 @@ serialInt:
 	di
 .exit
 	ret
-	
+
 ;VBlank
 ;----------------------
 vBlankInt:
-	
+
 .scanButtons
 ret
 
 ;DATA
 ;==============================================
-initText1: 
+initText1:
 	db "A FOR MASTER",0
 initText2:
 	db "B FOR SLAVE",0
@@ -215,7 +224,7 @@ masterTextTransfer:
 	db "SENDING",0
 masterTextDone:
 	db "TRANSFER FINISHED",0
-	
+
 slaveText:
 	db "SLAVE MODE",0
 slaveText2:
@@ -225,13 +234,15 @@ slaveTextTransfer:
 slaveTextDone:
 	db "DONE RECEIVING",0
 
+
+
 bottomText1:
 	db "TESTROM BY",0 ;10 hex pos
 bottomText2:
 	db "DANIEL CHU PEGMODE",0 ;11 hex
 ;SUBROUTINES
 ;================================================
-	
+
 
 include "GeneralSubroutines.asm"
 include "VideoSubroutines.asm"
