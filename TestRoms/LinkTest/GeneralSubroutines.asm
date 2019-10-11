@@ -87,15 +87,29 @@ push hl
 		pop hl
         ret
 
+Hex2ASCII:
+;reads in a hex value and returns its ascii representation
+
+
+Hex2ASCIITable:
+;  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F
+db 48,49,50,51,52,53,54,55,56,57,65,66,67,68,69,70
 
 ASCIITileTable:
+;CURRENT ORDER A-B, 0-1, a-b
 ;start @ 0x32 + index in this table
 ;entries are tile index in vram
-; " "  !   "   #   $   %   &   '   (   )   *   +   `   -   .   /
+; " "  !   "   #   $   %   &   '   (   )   *   +   '   -   .   /
 db $00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
-;  0   1   2   3   4   5   6   7   8   9   :   ;   <   =   >   ?
-db 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+;  0    1     2    3    4    5    6    7    8    9   :   ;   <   =   >   ?
+db $24, $1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23, 00, 00, 00, 00, 00, 00
 ;  @   A    B    C    D    E    F    G    H    I    J    K    L    M    N    O
 db 00, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
 ;  P    Q    R    S    T    U    V    W    X    Y    Z
 db $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A
+;  [   \   ]   ^   _   `
+db 00, 00, 00, 00, 00, 00
+;  a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p
+db 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+;  q   r   s   t   u   v   w   x   y   z
+db 00, 00, 00, 00, 00, 00, 00, 00, 00, 00

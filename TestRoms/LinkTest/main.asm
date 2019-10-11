@@ -38,6 +38,12 @@ loadInitPage:
 	call VRamCopyLoop;load first word of text tiles
 	ld c,161
 	call VRamCopyLoop;load second word of text tiles
+	;load numbers (could save here)
+	ld hl,NumberTiles
+	ld de,$8000+432 ;432 is the offset from the last load
+	ld c,160
+	call VRamCopyLoop
+
 
 	;line one text
 	ld hl,initText1
@@ -298,3 +304,4 @@ bottomText2:
 include "GeneralSubroutines.asm"
 include "VideoSubroutines.asm"
 include "Graphics/TextTiles.asm" ;TileSet1
+include "Graphics/NumberTiles.asm";numbers

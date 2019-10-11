@@ -18,11 +18,12 @@ VRamCopyLoop:
 		ld a,[hl+] ;Load the data at address hl into a and inc hl
 		ld [de],a ;Load the data into ram
 		inc de	;increment the VRam address
-		dec bc ;Decrement counter    FUCKING 16 BIT OPERATIONS DONT THROW FLAGS REEEEEEEEEEEEEEEE
+		dec bc ;Decrement counter     16 BIT OPERATIONS DONT THROW FLAGs
 		ld a,b
 		or c ;test if counter is zero
 		jp nz,VRamCopyLoop
     ret
+
 
 
 
@@ -62,12 +63,13 @@ LoadBGMap:
 
 ;Wait for V/HBlank
 ;==========================================================
+;Total time: 52 cycles
 ;stat %xxxxxx0x
 WaitBlank:
-	ld a,[rSTAT]
-	and 2
-	jr	nz,WaitBlank
-	ret
+	ld a,[rSTAT]    ;16C
+	and 2						;8C
+	jr	nz,WaitBlank;12 ~ 8C
+	ret							;16C
 
 ;Wait for VBlank
 ;==========================================================
