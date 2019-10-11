@@ -87,8 +87,55 @@ push hl
 		pop hl
         ret
 
+; Hex2ASCII:
+; ;reads in a hex value and returns its ascii representation
+; ;param: d = Input
+; ;rtn: BC = ASCII representation
+; ld a,$0F
+; and d
+; ld hl,Hex2ASCIITable
+; ;MAY CAUSE A BUG IF Hex2ASCIITABLE IS ON EDGE OF legal
+; add l
+; ld c,[hl]
+; ;Load 2nd char
+; ld a,$F0
+; and d
+; srl a
+; srl a
+; srl a
+; srl a
+; ld hl,Hex2ASCIITable
+; add l
+; ld b,[hl]
+; ret
 Hex2ASCII:
 ;reads in a hex value and returns its ascii representation
+;param: d = Input
+;rtn: BC = ASCII representation
+ld a,$0F
+and d
+ld hl,Hex2ASCIITable
+;MAY CAUSE A BUG IF Hex2ASCIITABLE IS ON EDGE OF legal
+push de ;save de
+ld d,0
+ld e,a
+add hl,de
+pop de; restore
+ld c,[hl]
+;Load 2nd char
+ld a,$F0
+and d
+srl a
+srl a
+srl a
+srl a
+ld hl,Hex2ASCIITable
+;no need to push b/c we dont care about de anymore
+ld d,0
+ld e,a
+add hl,de
+ld b,[hl]
+ret
 
 
 Hex2ASCIITable:

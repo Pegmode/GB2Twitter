@@ -27,7 +27,10 @@ StartupInit:
 	ldh [rBGP],a;
 ;==================================================
 debug1:
-
+	BREAKPOINT
+	ld d,$A3
+	call Hex2ASCII
+	BREAKPOINT
 
 loadInitPage:
 	;load text tiles
