@@ -65,6 +65,7 @@ loadInitPage:
 	jp z,setSlave
 	jp .waitForInitialInput
 
+
 main:
 	ld a,[rSC]
 	and 1
@@ -128,7 +129,7 @@ setSlave:
 	ld a,%10000000
 	ld [rSC],a;set GB to Slave
 	;LOAD TEST SLAVE PAYLOAD
-	ld a,$42
+	ld a,$42;PAYLOAD
 	ld [rSB],a
 	;clear line
 	ld hl,_SCRN0 + $20*3
@@ -178,11 +179,60 @@ FillASCIIMap:
 	pop bc
 	ret
 
-;printAt
+;printGB
 ;=========================================
-;hl = input text address,
-printAt:
+;Prints a semi formatted string at given line and col
+;hl = input text address, e = line #, c = col (line pos)
+;USES ALL REGISTER PAIRS
+printGB:
+	ld d,0;set d to zero for 16 bit op
+	ld b,0; b to zero for 16 bit op
+	sla e;e * 32 new line is 32
+	sla e
+	sla e
+	sla e
+	sla e
+	push hl;temp store hl
+	ld hl,_SCRN0
+	add hl,de ;_SCRN0 + line# * 32
+	add hl,bc; Line + x position
+	ld d,h; de = hl set destinatino address
+	ld e,l
+	pop hl;restore hl
 
+.l1
+;working: de = destination, bc = temp
+	ld a,[hl+]
+	cp $00;null termination char check
+	jr z,.exit
+	cp $0A;newline char check
+	jr z,.newline
+	sub 32; 32 is lowest in ascii block
+	ld b,0; 16SU
+	ld c,a
+	push hl; temp store
+	ld hl,ASCIITileTable
+	add hl,bc; get tile number table address
+	ld a,[hl];load tile num into a
+	pop hl; restore hl
+	push af
+	call WaitBlank
+	pop af
+	ld [de],a;load tile num into memory
+	inc de
+	jp .l1
+.newline
+	push hl;temp store
+	ld bc,32; new line is 32 diff
+	ld h,d ; de = hl
+	ld l,e
+	add hl,bc;destination is + 32
+	ld d,h
+	ld e,l
+	pop hl;restore hl
+	jp .l1
+.exit
+	ret
 
 ;INTERUPTS
 ;===================================================
@@ -234,7 +284,8 @@ slaveTextTransfer:
 slaveTextDone:
 	db "DONE RECEIVING",0
 
-
+debugString:
+	db "THIS IS \n A TEST",0
 
 bottomText1:
 	db "TESTROM BY",0 ;10 hex pos

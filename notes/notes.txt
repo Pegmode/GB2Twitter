@@ -1,0 +1,9 @@
+
+NEED TO THINK ABOUT A VIDEO HANDLER
+
+HBlank lasts aprox:169-175 clock
+VBlank lasts aprox:4570 clocks
+
+Size of 1 BG map: 0xFFF, 4,096 bytes
+
+to move data takes 8 +

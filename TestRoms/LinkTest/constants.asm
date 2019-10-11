@@ -34,6 +34,8 @@ N_ShadowOAM equ $C1 ;reference to first nibble of $C100
 OldJoyData equ $ff8b;stores last joy input
 NewJoyData equ $ff8c;stores new joy
 
+;Serial Payload reserv
+PayloadType equ $c300
 
 
 
