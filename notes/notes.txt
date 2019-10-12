@@ -7,3 +7,24 @@ VBlank lasts aprox:4570 clocks
 Size of 1 BG map: 0xFFF, 4,096 bytes
 
 to move data takes 8 +
+
+============Serial notes============
+
+NOTE: IN link test for master mode, 
+clock goes high and stays high before sending data and clocking
+
+
+============Cable type and coding============
+Type A:
+  ______
+ /1 3 5 \
+|_2_4_6__|
+
+1.+5C
+2.So	-orange
+3.Si	-red
+4.Rev
+5.CLK	-green
+6.GND	-blue
+Jacket.	-black
+
