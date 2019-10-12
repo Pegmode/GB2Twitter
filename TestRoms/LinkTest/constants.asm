@@ -36,8 +36,11 @@ NewJoyData equ $ff8c;stores new joy
 
 ;Serial Payload reserv
 PayloadType equ $c300
+DebugPayload equ $C301
 
-
+PayloadFirstChar equ $c302
+PayloadSecondChar equ $c303
+PayloadTermChar equ $c304
 
 _VTILE0 equ $8000 ;BG & Window Tile Data Select set to 1 (defualt)
 _VTILE1 equ $8800 ;BG & Window Tile Data Select set to 0

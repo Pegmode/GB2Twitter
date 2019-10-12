@@ -7,7 +7,7 @@ include "hardware.asm"
 include "constants.asm"
 include "macros.asm"
 
-;Header (Code from here down)
+;Header
 ;==================================================
 include "GBHeader.asm"
 
@@ -25,9 +25,6 @@ StartupInit:
 	ld [rLCDC],a
 	ld a,%11100100;"Expected" 11100100, "Default tile editor"
 	ldh [rBGP],a;
-
-  xor a;ld 0
-  ld [PayloadTermChar],a ;load Term Char for later prints
 ;==================================================
 debug1:
 
@@ -46,100 +43,77 @@ loadInitPage:
 	ld de,$8000+432 ;432 is the offset from the last load
 	ld c,160
 	call VRamCopyLoop
-	call printCurrentSerial
 
-firstloadFirstPage:;data that stays constant
-  ;info bottom text
-  ld hl,bottomText1
-  ld de,_SCRN0 + $20*$10
-  call FillASCIIMap
-  ld hl,bottomText2
-  ld de,_SCRN0 + $20*$11
-  call FillASCIIMap
-  ld hl,currentPayloadText1
-  ld de,_SCRN0
-  call FillASCIIMap
 
-loadFirstPage:
 	;line one text
 	ld hl,initText1
-	ld de,_SCRN0 + $20 * 3
+	ld de,_SCRN0
 	call FillASCIIMap
 	;line 2 text
 	ld hl,initText2
-	ld de,_SCRN0 + $20 * 4 ;$20 diff for new line
+	ld de,_SCRN0 + $20 ;$20 diff for new line
 	call FillASCIIMap
-  jp idleHandleInput
+	;info bottom text
+	ld hl,bottomText1
+	ld de,_SCRN0 + $20*$10
+	call FillASCIIMap
+	ld hl,bottomText2
+	ld de,_SCRN0 + $20*$11
+	call FillASCIIMap
+
+
+.waitForInitialInput
+	call ReadJoy
+	ld a,[OldJoyData]
+	cp $1;check B button
+	jp z,setMaster
+	cp $2;check A botton
+	jp z,setSlave
+	; cp $20;check left
+	; jp nz,.waitForInitialInput
+	; call DecPayload
+	; jp .waitForInitialInput
+	; cp $10;check right
+	; jp nz,.waitForInitialInput
+	; call IncPayload
+	jp .waitForInitialInput
 
 DecPayload:
-	ld a,[rSB]
+	ld a,[rSC]
 	dec a
-	ld [rSB],a
-  call printCurrentSerial
+	ld [rSC],a
 	ret
 IncPayload:
-	ld a,[rSB]
-	inc a
-	ld [rSB],a
-  call printCurrentSerial
+	ld a,[rSC]
+	inc a,
+	ld [rSC],a
 	ret
 
-clearText:
-  ld hl,_SCRN0
-  ld bc,$99F3-$9860
-  call ClearLoop
-  ret
-
-
-idleHandleInput:;NOT A CALL FUNCTION, has currently replaced main
-  call ReadJoy
-  ld a,[OldJoyData]
-	ld b,a
-	ld a,[NewJoyData]
-	cp b
-	jp nz,idleHandleInput
-	ld a,[OldJoyData]
-  cp $1;check B button
-  jp z,setMaster
-  cp $2;check A botton
-  jp z,setSlave
-  cp $20;check left
-  jp nz,idleHandleInput
-  call DecPayload
-  jp idleHandleInput
-  cp $10;check right
-  jp nz,idleHandleInput
-	BREAKPOINT
-  call IncPayload
-  jp idleHandleInput
-
 main:
-  jp idleHandleInput; idleHandleInput has become the new main
+	ld a,[rSC]
+	and 1
+	cp 1;check if in master mode
+	jp nz,.notMaster;if not in master mode jp
+	call ReadJoy
+	ld a,[OldJoyData]
+	cp $8;check for start button
+	jp z,startTransfer
+.notMaster
+	nop
 .exit
 	jp main
 
-slaveWaitLoop:
-  ld a,[rSC]
-  ld b,$80; select last bit
-  and b
-  jp nz,slaveWaitLoop;wait for TRANSFER
-	ld hl,slaveTextDone
-	ld de,_SCRN0 + $20*4
-	call FillASCIIMap
-  jp waitNextMainCycle
+idlePost:
+
 
 startTransfer:;as master start transfer
 	;clear old
-	ld hl,_SCRN0 + $20*3
+	ld hl,_SCRN0 + $20*4
 	ld bc,scrWidth_tiles
 	call ClearLoop
-  ;clear old
-  ld hl,_SCRN0 + $20*4
-  ld bc,scrWidth_tiles
-  call ClearLoop
 	;update text
 	ld hl,masterTextTransfer
-	ld de,_SCRN0 + $20*3
+	ld de,_SCRN0 + $20*4
 	call FillASCIIMap
 	ld a,%10000001
 	ld [rSC],a;START TRANSFER!
@@ -156,40 +130,14 @@ startTransfer:;as master start transfer
 	ld hl,masterTextDone
 	ld de,_SCRN0 + $20*4
 	call FillASCIIMap
-	jp waitNextMainCycle
-
-waitNextMainCycle:;wait for user input to restart whole process
-	call printCurrentSerial
-.l1
-	call ReadJoy
-	ld a,[OldJoyData]
-	ld b,a
-	ld a,[NewJoyData]
-	cp b
-	jp nz,.l1
-	ld a,[OldJoyData]
-  cp $8;check start button
-	; SORRY FOR THIS
-	call ReadJoy
-	ld a,[OldJoyData]
-	ld b,a
-	ld a,[NewJoyData]
-	cp b
-	jp nz,.l1
-	ld a,[OldJoyData]
-	cp $8;check start button
-  jp nz,.l1
-  ;exit the cycle
-  ;clear the screen
-  ld hl,_SCRN0 + $20 *3
-  ld bc,scrWidth_tiles * 3
-  call ClearLoop
-  jp loadFirstPage
+	jp main
 
 setMaster:
 	ld a,1
 	ld [rSC],a;set GB to master
-
+	;LOAD TEST MASTER PAYLOAD
+	ld a,$69
+	ld [rSB],a
 	;clear line
 	ld hl,_SCRN0 + $20*3
 	ld bc,scrWidth_tiles
@@ -201,22 +149,14 @@ setMaster:
 	ld hl,masterText2
 	ld de,_SCRN0 + $20*4
 	call FillASCIIMap
-.waitForStartInput
-	call ReadJoy
-	ld a,[OldJoyData]
-	ld b,a
-	ld a,[NewJoyData]
-	cp b
-	jp nz,.waitForStartInput
-	ld a,[OldJoyData]
-	cp $8;check start
-	jp nz,.waitForStartInput
-	jp startTransfer
+	jp main
 
 setSlave:
 	ld a,%10000000
 	ld [rSC],a;set GB to Slave
-
+	;LOAD TEST SLAVE PAYLOAD
+	ld a,$42;PAYLOAD
+	ld [rSB],a
 	;clear line
 	ld hl,_SCRN0 + $20*3
 	ld bc,scrWidth_tiles
@@ -231,27 +171,9 @@ setSlave:
 	;ld a,%00000100 ;set interupt
 	;ld [rIF],a
 	;ei
-	jp slaveWaitLoop
+	jp main
 
 printCurrentSerial:
-  ;clear line
-  ld hl,_SCRN0 + $10
-  ld bc,3
-  call ClearLoop
-  ;load and convert values
-  ld a,[rSB]
-  ld d,a
-  call Hex2ASCII
-  ;print values
-  ld a,b
-  ld [PayloadFirstChar],a
-  ld a,c
-  ld [PayloadSecondChar],a
-  ld hl,PayloadFirstChar
-  ld de,_SCRN0 + $10
-  call FillASCIIMap
-  ret
-
 
 
 ;ASCII2tile
@@ -387,9 +309,6 @@ slaveTextTransfer:
 	db "RECEIVING",0
 slaveTextDone:
 	db "DONE RECEIVING",0
-
-currentPayloadText1:
-  db "CURRENT PAYLOAD",0
 
 debugString:
 	db "THIS IS \n A TEST",0

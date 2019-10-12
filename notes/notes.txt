@@ -13,6 +13,9 @@ to move data takes 8 +
 NOTE: IN link test for master mode, 
 clock goes high and stays high before sending data and clocking
 
+idle high at ~ 0.6-0.7 V on master init
+
+
 
 ============Cable type and coding============
 Type A:
