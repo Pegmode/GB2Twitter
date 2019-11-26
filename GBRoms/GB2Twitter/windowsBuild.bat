@@ -1,6 +1,6 @@
 @echo off
-set project_name=LinkTest
-set bgb="C:\Chip Dev\Emu\bgb.exe"
+set project_name=GB2Twitter
+set bgb="C:\BGB\bgb64.exe"
 
 rgbasm -o%project_name%.obj main.asm
 if %errorlevel% neq 0 call :exit 1

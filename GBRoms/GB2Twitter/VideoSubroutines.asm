@@ -73,13 +73,19 @@ WaitBlank:
 
 ;Wait for VBlank
 ;==========================================================
-;stat %xxxxxx00
+;wait for Beginning of vBlank
+;holds for a long time
+;stat %xxxxxx01
 WaitVBlank:
 	ld a,[rSTAT]
-	and 2
-	jr nz,WaitVBlank
-	and 1
-	jr nz,WaitVBlank
+	bit 0,a
+	jr nz,WaitVBlank;wait for non vBlankState
+.waitforVBlank;
+	ld a,[rSTAT]
+	bit 0,a
+	jr z,.waitforVBlank
+	bit 1,a
+	jr nz,.waitforVBlank
 	ret
 
 ;Wait for rSTAT to change

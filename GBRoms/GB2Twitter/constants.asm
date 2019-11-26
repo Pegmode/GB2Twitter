@@ -24,8 +24,8 @@ Music_Player_MusicUpdate      equ     $4100
 ShadowX equ $C000
 ShadowY equ $C001
 CurrentScreenFlag equ $C002
-BounceFlag equ $c005 ;7:Direction,
-BounceV equ $c006
+TextInputPointer equ $c005 ;2 bytes reserved
+
 Seed equ $C020 ;Random number generator seed 3 bytes long
 
 ShadowOAM equ $C100 ;Shadow OAM adddress

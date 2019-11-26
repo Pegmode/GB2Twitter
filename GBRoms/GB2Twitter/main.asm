@@ -21,38 +21,68 @@ StartupInit:
 	call WaitVBlank
 	call ClearVRAM ;DONT ASSUME INITIAL STATE
 	call WaitVBlank
-	ld a,%10010001 ;"Default" 10010001
+	ld a,%11100001;"Default" 10010001
+			; 76543210
 	ld [rLCDC],a
 	ld a,%11100100;"Expected" 11100100, "Default tile editor"
 	ldh [rBGP],a;
 
+	call loadUITiles
+	call loadTextInputWindow
+	call enableLCD
 
 ;==================================================
 main:
-
 .mainLoop
-	jp .exit
+	jp .mainLoop
 
 
-loadTextInput:
+loadUITiles:
+	call disableLCD;WILL HANG IF LCD IS NOT ENABLED
+	ld hl,TextTiles
+	ld bc,$8800+16;Tiles 2
+	ld de,26*16
+	call MemCopyLong
+	ld hl,NumberTiles
+	ld de,10*16
+	call MemCopyLong
+	ld hl,LowerCase
+	ld de,26*16
+	call MemCopyLong
+	ld hl,OtherChar
+	ld de,8*16
+	call MemCopyLong
+	ret;LCD is still disabled!
+
+loadTextInputWindow:
+	;load window map with UITiles References
+	ld hl,rWX
+	ld a,7
+	ld [hl],a
+	ld hl,rWY
+	ld a,104-8; 6 high
+	ld [hl],a
+
+
+	ld a,6
+	ld hl,CurrentMapHeight
+	ld [hl],a
+
+	ld hl, WindowMapUpper
+	ld bc, 16*20
+	ld de,_SCRN1
+
+
+	call LoadBGMap
+
+	ret
 
 
 
 ;INTERUPTS
 ;===================================================
 serialInt:
-	ld a,[rSB]
-	cp %10000001
-	jp z,.exit;jump if master
-	;clear old
-	ld hl,_SCRN0 + $20*4
-	ld bc,scrWidth_tiles
-	call ClearLoop
-	;update text
-	ld hl,slaveTextDone
-	ld de,_SCRN0 + $20*4
-	call FillASCIIMap
-	di
+
 .exit
 	ret
 
@@ -74,5 +104,9 @@ initText1:
 
 include "GeneralSubroutines.asm"
 include "VideoSubroutines.asm"
-include "Graphics/TextTiles.asm" ;TileSet1
+include "Graphics/TextTiles.asm" ;uppercase
 include "Graphics/NumberTiles.asm";numbers
+include "Graphics/otherChar.asm";Other chars
+include "Graphics/lowercase.asm";lowercase
+include "Graphics/WindowMap.asm"
+include "Graphics/ShiftKey.asm";n

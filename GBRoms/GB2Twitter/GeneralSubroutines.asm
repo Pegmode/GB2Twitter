@@ -2,6 +2,20 @@
 ;GENERAL SUBROUTINES
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+;MemCopyLong
+;==========================================================
+;Input requirements: hl = Source Address, bc = destination, de = data length
+MemCopyLong:
+	ld a,[hl+]
+	ld [bc],a
+	inc bc
+	dec de
+	xor a
+	or e
+	jp nz,MemCopyLong
+	or d
+	jp nz,MemCopyLong
+	ret
 
 ;MemCopy
 ;==========================================================
@@ -61,6 +75,25 @@ ReadJoy:
 	ld [rP1],A;Reset Joypad
 	ret
 
+;disableLCD
+;==========================================================
+;SAFELY disable LCD and preserve LCDC
+disableLCD:
+	call WaitVBlank
+	ld a,[rLCDC]
+	ld b,$7F
+	and b
+	ld [rLCDC],a
+	ret
+;enableLCD
+;==========================================================
+;WARNING: ENSURE THAT LCD IS DISABLED TO PREVENT PHYSICAL DAMAGE TO ELECTRONICS
+enableLCD:
+	ld a,[rLCDC]
+	ld b,$80
+	or b
+	ld [rLCDC],a
+	ret
 
 ;Random Number Generator	(credit Jeff Frohwein)
 ;==========================================================
