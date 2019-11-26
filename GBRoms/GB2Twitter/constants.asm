@@ -49,19 +49,6 @@ _VTILE1 equ $8800 ;BG & Window Tile Data Select set to 0
 CurrentMapHeight EQU $D000 ;current height
 
 
-;Bounce Physics constants
-
-VelocityI1 equ 15 ;right
-VelocityI2 equ 8 ;left
-Acceleration1 equ 1;right
-Acceleration2 equ 1 ;left
-MaxD equ 160
-MinD equ 8;20
-;d = v+d
-;v = v-a1
-;check if d is in bounds
-;if fail then cont, if pass then go back to beginning
-;v=vi2
-;d=v-d
-;v=v-a2
-;check again
+;TextBox constants
+TCursorXInit EQU 16
+TCursorYInit EQU 120

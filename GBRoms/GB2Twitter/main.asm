@@ -48,13 +48,16 @@ StartupInit:
 main:
 .mainLoop
 	call ReadJoy
-	ld a,[OldJoyData]
-	bit 4,a
-	jp z,.DebugSkip
-	BREAKPOINT
-.DebugSkip
 
 	jp .mainLoop
+
+
+textInputHandling:
+	ld a,[OldJoyData]
+	bit 4,a
+	jp z,.c1 ;right pressed
+	call WaitVBlank
+.c1
 
 
 loadUITiles:
@@ -79,10 +82,10 @@ loadCursor:
 	;ONLY DURING v/hBLANK or LCD off
 	ld hl,_OAMRAM
 	;yPos
-	ld a,104+16+8
+	ld a,120
 	ld [hl+],a
 	;xPos
-	ld a,16+32+16
+	ld a,16
 	ld [hl+],a
 	;Tile
 	ld a,1;tile 1
@@ -133,13 +136,7 @@ ret
 initText1:
 	db "A FOR MASTER",0
 
-textInputArray:
-;abstraction of textbox
-;contains 3 one byte long items
-;		Position x
-;		Position y
-;		ASCII Reference
-	
+include "inputTextArray.asm"
 
 
 ;SUBROUTINES
