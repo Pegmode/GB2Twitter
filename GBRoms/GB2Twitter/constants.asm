@@ -24,7 +24,10 @@ Music_Player_MusicUpdate      equ     $4100
 ShadowX equ $C000
 ShadowY equ $C001
 CurrentScreenFlag equ $C002
-TextInputPointer equ $c005 ;2 bytes reserved
+
+TextInputPointerMS equ $c005 ;2 bytes reserved
+TextInputPointerLS equ $c006
+
 
 Seed equ $C020 ;Random number generator seed 3 bytes long
 
