@@ -18,15 +18,28 @@ SECTION "Main Program",HOME[$155]
 ;Startup (ENTRY POINT!)
 ;----------------------
 StartupInit:
+
 	call WaitVBlank
-	call ClearVRAM ;DONT ASSUME INITIAL STATE
-	call WaitVBlank
-	ld a,%11100001;"Default" 10010001
+	ld a,%11100011;"Default" 10010001
 			; 76543210
 	ld [rLCDC],a
 	ld a,%11100100;"Expected" 11100100, "Default tile editor"
 	ldh [rBGP],a;
+	ld a,%11100100;"Expected" 11100100, "Default tile editor"
+	ldh [rOBP0],a;
 
+	;video init
+	call disableLCD
+	call ClearVRAM
+	ld hl,_OAMRAM
+	ld bc,$009f
+	call ClearLoop
+	;sprite tiles
+	ld hl,hContrastCursor
+	ld bc,$8000+16;Tiles 2
+	ld de,16
+	call MemCopyLong
+	call loadCursor
 	call loadUITiles
 	call loadTextInputWindow
 	call enableLCD
@@ -34,11 +47,18 @@ StartupInit:
 ;==================================================
 main:
 .mainLoop
+	call ReadJoy
+	ld a,[OldJoyData]
+	bit 4,a
+	jp z,.DebugSkip
+	BREAKPOINT
+.DebugSkip
+
 	jp .mainLoop
 
 
 loadUITiles:
-	call disableLCD;WILL HANG IF LCD IS NOT ENABLED
+	;call disableLCD;WILL HANG IF LCD IS NOT ENABLED
 	ld hl,TextTiles
 	ld bc,$8800+16;Tiles 2
 	ld de,26*16
@@ -52,7 +72,24 @@ loadUITiles:
 	ld hl,OtherChar
 	ld de,8*16
 	call MemCopyLong
+
 	ret;LCD is still disabled!
+
+loadCursor:
+	;ONLY DURING v/hBLANK or LCD off
+	ld hl,_OAMRAM
+	;yPos
+	ld a,104+16+8
+	ld [hl+],a
+	;xPos
+	ld a,16+32+16
+	ld [hl+],a
+	;Tile
+	ld a,1;tile 1
+	ld [hl+],a
+
+	;OBJflags
+	ret
 
 loadTextInputWindow:
 	;load window map with UITiles References
@@ -63,7 +100,6 @@ loadTextInputWindow:
 	ld a,104-8; 6 high
 	ld [hl],a
 
-
 	ld a,6
 	ld hl,CurrentMapHeight
 	ld [hl],a
@@ -71,7 +107,6 @@ loadTextInputWindow:
 	ld hl, WindowMapUpper
 	ld bc, 16*20
 	ld de,_SCRN1
-
 
 	call LoadBGMap
 
@@ -98,6 +133,15 @@ ret
 initText1:
 	db "A FOR MASTER",0
 
+textInputArray:
+;abstraction of textbox
+;contains 3 one byte long items
+;		Position x
+;		Position y
+;		ASCII Reference
+	
+
+
 ;SUBROUTINES
 ;================================================
 
@@ -110,3 +154,5 @@ include "Graphics/otherChar.asm";Other chars
 include "Graphics/lowercase.asm";lowercase
 include "Graphics/WindowMap.asm"
 include "Graphics/ShiftKey.asm";n
+include "Graphics/SpriteCursor.asm"
+include "Graphics/hContrastCursor.z80";

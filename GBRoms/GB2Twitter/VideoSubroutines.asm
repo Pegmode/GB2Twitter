@@ -112,7 +112,7 @@ WaitStat:
 DMATransCode:
 	ld a,N_ShadowOAM
 	ld [rDMA],a ;initiate DMA Transfer from N_ShadowOAM to OAM
-    ld      a, $28 ;wait 128 micro seconds while transfer completes
+  ld      a, $28 ;wait 128 micro seconds while transfer completes
 .loop:
 	dec     a
 	jr     nz, .loop
@@ -165,11 +165,6 @@ SetSpriteTile:
 	call SelectSprite
 	inc hl;add optimized
 	inc hl
-;CreateMetaSprite
-;========================================================
-; x, y, width, height, map loc
-CreateMetaSprite:
-
 
 ;Load Standard DMG pallet
 ;============================================================
@@ -194,7 +189,7 @@ ClearVRAM:
 	;bc = length
 
 ClearLoop:
-	call WaitStat ;REPLACE THIS WITH DISABLING THE LCD WHEN ITS CALLED
+	;call WaitStat ;REPLACE THIS WITH DISABLING THE LCD WHEN ITS CALLED
 	xor	a
 	ld	[hl+],a
 	dec	bc
@@ -202,11 +197,3 @@ ClearLoop:
 	or	c
 	jr	nz,ClearLoop
 	ret
-
-
-; Loads a DMG palette. (Credit DevEd)
-; USAGE: SetPal <rBGP/rOBP0/rOBP1>,(color 1),(color 2),(color 3),(color 4)
-SetDMGPal:                macro
-    ld    a,(\2 + (\3 << 2) + (\4 << 4) + (\5 << 6))
-    ldh    [\1],a
-    endm
