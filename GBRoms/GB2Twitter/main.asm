@@ -321,6 +321,26 @@ sendTweet:
 	BREAKPOINT
 	jp .l1
 .exit
+.checkFTransfer
+	ld a,[rSC]
+	and %10000000
+	jp nz,.checkFTransfer
+	rl a; 8 cyles each
+	rl a
+	rl a
+	rl a
+	rl a
+	rl a
+	rl a
+	rl a
+	rl a
+	rl a
+	rl a
+	ld a,4
+	ld [rSB],a;load termination Payload
+	ld a,[rSC]
+	ld a,%10000001
+	ld [rSC],a;START TRANSFER!
 	ret
 
 resetTextinput:
