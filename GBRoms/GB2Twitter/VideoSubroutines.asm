@@ -196,4 +196,5 @@ ClearLoop:
 	ld	a,b
 	or	c
 	jr	nz,ClearLoop
+
 	ret

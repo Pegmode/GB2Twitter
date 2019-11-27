@@ -272,6 +272,8 @@ textInputHandling:
 	ld b,4; 4 = eot (End of Transmission
 	call addToTweetBuffer
 	call sendTweet
+
+	call resetTextinput
 	jp .exit
 .c5
 	bit 1,a
@@ -287,7 +289,6 @@ textInputHandling:
 	ret
 
 sendTweet:
-	BREAKPOINT
 
 	ld hl,TweetBuffer
 	ld a,[rSC]
@@ -306,11 +307,38 @@ sendTweet:
 	rl a
 	rl a
 	rl a
-	BREAKPOINT
 	jp .l1
 .exit
 	ret
 
+resetTextinput:
+
+	ld a,0
+	ld [ScreenPointerCol],a
+	ld hl,_SCRN0
+	ld a,h
+	ld [ScreenPointerMS],a
+	ld a,l
+	ld [ScreenPointerLS],a
+
+	call disableLCD
+	ld bc,173;aprox length
+	call ClearLoop
+
+	call enableLCD
+	;input ptr
+	ld hl,textInputArray
+	ld a,h
+	ld [TextInputPointerMS],a
+	ld a,l
+	ld [TextInputPointerLS],a
+	ld a,0
+	ld [TweetPointerIndex],a
+	;reset serial buffer
+	ld hl,TweetBuffer
+	ld bc,$100
+	call ClearLoop
+	ret
 ;arg b = char
 ;note: does not inc index
 putToTWDisplay:
