@@ -27,3 +27,13 @@ mFillInvisBlank: macro
 ;size = 12
 	db 0,0,0,0,0,0,0,0,0,0,0,0
 	endm
+
+sub16: macro ;bc
+	; bc -= de
+	ld a, c
+	sub e
+	ld c, a
+	ld a, b
+	sbc d
+	ld b, a
+	endm

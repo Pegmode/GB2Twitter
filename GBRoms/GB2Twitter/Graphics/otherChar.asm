@@ -10,7 +10,7 @@
 ;   Compression          : None.
 ;   Counter              : None.
 ;   Tile size            : 8 x 8
-;   Tiles                : 0 to 7
+;   Tiles                : 0 to 7 + 1
 ;
 ;   Palette colors       : None.
 ;   SGB Palette          : None.
@@ -29,6 +29,8 @@
 ;   5:corner
 ;   6:Horizontal edge
 ;   7:Cursor
+
+;   8:space char
 
 
 ; Start of tile array.
@@ -49,5 +51,8 @@ DB $00,$00,$00,$00,$FF,$FF,$55,$00
 DB $AA,$00,$FF,$FF,$00,$00,$00,$00
 DB $00,$00,$00,$00,$00,$00,$18,$18
 DB $24,$3C,$42,$7E,$42,$7E,$42,$7E
+;;spacechar
+DB $00,$00,$00,$00,$00,$00,$00,$00
+DB $00,$00,$42,$63,$7E,$7F,$00,$7F
 
 ; End of OTHERCHAR.Z80

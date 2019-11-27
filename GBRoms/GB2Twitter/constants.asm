@@ -27,6 +27,7 @@ CurrentScreenFlag equ $C002
 
 TextInputPointerMS equ $c005 ;2 bytes reserved
 TextInputPointerLS equ $c006
+TweetPointerIndex equ $c007
 
 
 Seed equ $C020 ;Random number generator seed 3 bytes long
@@ -50,7 +51,7 @@ _VTILE1 equ $8800 ;BG & Window Tile Data Select set to 0
 
 ;Draw functions (RAM
 CurrentMapHeight EQU $D000 ;current height
-
+TweetBuffer equ $D001 ; ~100 reserved
 
 ;TextBox constants
 TCursorXInit EQU 16

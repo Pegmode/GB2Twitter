@@ -28,6 +28,10 @@ StartupInit:
 	ld a,%11100100;"Expected" 11100100, "Default tile editor"
 	ldh [rOBP0],a;
 
+	;Clearram
+	ld hl,_RAM
+	ld bc,$2000
+	call ClearLoop
 	;video init
 	call disableLCD
 	call ClearVRAM
@@ -43,6 +47,8 @@ StartupInit:
 	call loadUITiles
 	call loadTextInputWindow
 	call enableLCD
+
+
 
 ;==================================================
 main:
@@ -61,6 +67,7 @@ textInputHandling:
 	;and b
 
 	bit 4,a
+
 	jp z,.c1
 ;RIGHT PRESSED
 
@@ -70,6 +77,19 @@ textInputHandling:
 	ld a,[TextInputPointerLS]
 	ld l,a
 	add hl,de
+	;checkBounds
+	; bc -= de
+	ld d,h
+	ld e,l
+	ld bc,InputArrayEnd - 2
+	ld a, c
+	sub e
+	ld c, a
+	ld a, b
+	sbc d
+	ld b, a
+	jp c,.exit;if button press is out of bounds
+
 	ld a,h
 	ld [TextInputPointerMS],a
 	ld a,l
@@ -90,6 +110,7 @@ textInputHandling:
 	jp .exit
 .c1;rightnotPressed
 	bit 5,a
+
 	jp z,.c2
 	;Left was pressed
 	ld a,[TextInputPointerMS]
@@ -99,6 +120,19 @@ textInputHandling:
 	dec hl;hl - 3
 	dec hl
 	dec hl
+	;checkBounds
+	; bc -= de
+	ld b,h
+	ld c,l
+	ld de,textInputArray
+	ld a, c
+	sub e
+	ld c, a
+	ld a, b
+	sbc d
+	ld b, a
+	jp c,.exit;if button press is out of bounds
+
 	ld a,h
 	ld [TextInputPointerMS],a
 	ld a,l
@@ -120,13 +154,29 @@ textInputHandling:
 
 .c2 ;left not pressed
 	bit 7,a
+
 	jp z,.c3
+	;down
 	ld de,54
 	ld a,[TextInputPointerMS]
 	ld h,a
 	ld a,[TextInputPointerLS]
 	ld l,a
 	add hl,de
+
+	;checkBounds
+	; bc -= de
+	ld d,h
+	ld e,l
+	ld bc,InputArrayEnd
+	ld a, c
+	sub e
+	ld c, a
+	ld a, b
+	sbc d
+	ld b, a
+	jp c,.exit;if button press is out of bounds
+
 	ld a,h
 	ld [TextInputPointerMS],a
 	ld a,l
@@ -146,11 +196,154 @@ textInputHandling:
 	inc hl
 	jp .exit
 .c3
+	bit 6,a
+
+	jp z,.c4
+	;Up
+	ld a,[TextInputPointerMS]
+	ld h,a
+	ld a,[TextInputPointerLS]
+	ld l,a
+
+	ld de,54
+	;hl -= de
+	ld a,l
+	sub e
+	ld l,a
+	ld a,h
+	sbc d
+	ld h,a
+
+	;checkBounds
+	; bc -= de
+	ld b,h
+	ld c,l
+	ld de,textInputArray
+	ld a, c
+	sub e
+	ld c, a
+	ld a, b
+	sbc d
+	ld b, a
+	jp c,.exit;if button press is out of bounds
+
+	ld a,h
+	ld [TextInputPointerMS],a
+	ld a,l
+	ld [TextInputPointerLS],a
+	ld b,[hl];x pos
+	inc hl
+	ld c,[hl];y pos
+	inc hl
+	;WRITE TO OUTPUT
 	;
+	ld hl,_OAMRAM
+	call WaitVBlank
+
+	ld [hl],c
+	inc hl
+	ld [hl],b
+	inc hl
+	jp .exit
+.c4
+	bit 0,a
+
+	jp z,.c5
+
+	;a
+	ld a,[TextInputPointerMS]
+	ld h,a
+	ld a,[TextInputPointerLS]
+	ld l,a
+	inc hl
+	inc hl
+	ld a,[hl]
+	cp "~"
+	jp z,.sendTweetSel
+	dec hl
+	dec hl
+	ld de,2
+	add hl,de
+	ld b,[hl]
+	call putToTWDisplay
+	call addToTweetBuffer
+	jp .exit
+.sendTweetSel
+	ld b,4; 4 = eot (End of Transmission
+	call addToTweetBuffer
+	call sendTweet
+	BREAKPOINT
+	jp .exit
+.c5
+	bit 1,a
+
+	jp z,.c6
+	;b
+	call removeFromTWDisplay
+	call removeTweetFromBuffer
+
+	jp .exit
+.c6
 .exit
 	ret
 
+sendTweet:
 
+	ret
+
+;arg b = char
+;note: does not inc index
+putToTWDisplay:
+	ld a,b
+	ld d,32
+	sub d; a -32
+	ld d,0
+	ld e,a
+	ld hl,ASCIITileTable
+	add hl,de
+	ld c,[hl];load map ref tile
+	;_SCRN0
+	ld hl,_SCRN0
+	ld a,[TweetPointerIndex]
+
+	ld d,0
+	ld e,a
+	add hl,de
+	call WaitBlank
+	ld [hl],c
+	ret
+;note does not dec index
+removeFromTWDisplay:
+	ld hl,_SCRN0
+	ld a,[TweetPointerIndex]
+	ld d,0
+	ld e,a
+	dec hl;index has not been dec yet so we gotta temp it
+	add hl,de
+	call WaitBlank
+	ld [hl],d;may have to change d val later
+	ret
+
+;arg: b = char
+;note: incs index
+addToTweetBuffer:
+	ld hl,TweetBuffer
+	ld a,[TweetPointerIndex]
+	ld d,0
+	ld e,a
+	add hl,de
+	ld [hl],b
+	inc e
+	ld a,e
+	ld [TweetPointerIndex],a
+	ret
+
+;note: decs index
+removeTweetFromBuffer:
+	ld a,[TweetPointerIndex]
+	dec a
+	ld [TweetPointerIndex],a
+	ret
 
 
 loadUITiles:
@@ -166,7 +359,7 @@ loadUITiles:
 	ld de,26*16
 	call MemCopyLong
 	ld hl,OtherChar
-	ld de,8*16
+	ld de,9*16
 	call MemCopyLong
 
 	ret;LCD is still disabled!
@@ -214,7 +407,34 @@ loadTextInputWindow:
 
 	ret
 
+;ASCII2tile
+;=====================================
+;hl = input text address, de = destination
+FillASCIIMap:
+	push bc
+	ld b,32
+.l1
+	ld a,[hl+]
+	cp $00 ;null termination char
+	jr z,.exit ;test if current ascii is the null termination character (0)
 
+	sub 32;convert to "A" table index positions
+	ld b,0
+	ld c,a
+	push hl;need hl for 16 bit add
+	ld hl,ASCIITileTable
+	add hl,bc
+	ld a,[hl];load tile number for ascii char into A
+	pop hl;get back actual hl
+	push af
+	call WaitBlank
+	pop af
+	ld [de],a ;load tile number into destination
+	inc de
+	jr .l1
+.exit
+	pop bc
+	ret
 
 ;INTERUPTS
 ;===================================================
