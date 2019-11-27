@@ -28,6 +28,11 @@ CurrentScreenFlag equ $C002
 TextInputPointerMS equ $c005 ;2 bytes reserved
 TextInputPointerLS equ $c006
 TweetPointerIndex equ $c007
+ScreenPointerOffset equ $c008
+ScreenPointerCol equ $c009
+ScreenPointerRow equ $C00A
+ScreenPointerMS equ $c00B ;2 bytes reserved
+ScreenPointerLS equ $c00C
 
 
 Seed equ $C020 ;Random number generator seed 3 bytes long

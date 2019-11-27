@@ -47,7 +47,7 @@ StartupInit:
 	call loadUITiles
 	call loadTextInputWindow
 	call enableLCD
-	ld hl,ScreenPointerMS
+
 
 
 ;==================================================
@@ -272,6 +272,7 @@ textInputHandling:
 	ld b,4; 4 = eot (End of Transmission
 	call addToTweetBuffer
 	call sendTweet
+	BREAKPOINT
 	jp .exit
 .c5
 	bit 1,a
@@ -287,34 +288,12 @@ textInputHandling:
 	ret
 
 sendTweet:
-	BREAKPOINT
 
-	ld hl,TweetBuffer
-	ld a,[rSC]
-	set 0,a;set to internal clock
-	ld [rSC],a
-.l1
-	ld a,[hl+]
-	cp 4 ;EOT
-	jr z,.exit
-	ld [rSB],a;load Payload
-	ld a,[rSC]
-	set 7,a
-	ld [rSC],a;START TRANSFER!
-	;wait!
-	rl a; 8 cyles each
-	rl a
-	rl a
-	rl a
-	BREAKPOINT
-	jp .l1
-.exit
 	ret
 
 ;arg b = char
 ;note: does not inc index
 putToTWDisplay:
-
 	ld a,b
 	ld d,32
 	sub d; a -32
@@ -323,72 +302,24 @@ putToTWDisplay:
 	ld hl,ASCIITileTable
 	add hl,de
 	ld c,[hl];load map ref tile
-	;to move add 12
-
 	;_SCRN0
+	ld hl,_SCRN0
+	ld a,[TweetPointerIndex]
 
-	ld a,[ScreenPointerCol]
+	ld d,0
 	ld e,a
-	ld a,19
-	cp e
-	ld a,e
-	ld e,1
-	jr nc,.c1;do we need newline?
-	ld e,13
-	ld a,0
-
-.c1
-	inc a
-	ld [ScreenPointerCol],a
-	ld a,[ScreenPointerMS]
-	ld h,a
-	ld a,[ScreenPointerLS]
-	ld l,a
-
 	add hl,de
-	ld a,h
-	ld [ScreenPointerMS],a
-	ld a,l
-	ld [ScreenPointerLS],a
-	dec hl
 	call WaitBlank
 	ld [hl],c
 	ret
 ;note does not dec index
 removeFromTWDisplay:
-	ld a,[ScreenPointerCol]
-	ld e,1
-	ld d,a
-	ld b,0
-	cp b
-
-	jr nz,.c1 ;if not on line edge
-	ld d,19
-	ld e,13
-
-.c1
-	ld a,d
-	dec a
+	ld hl,_SCRN0
+	ld a,[TweetPointerIndex]
 	ld d,0
-	ld [ScreenPointerCol],a
-	ld a,[ScreenPointerMS]
-	ld h,a
-	ld a,[ScreenPointerLS]
-	ld l,a
-
-	; hl -= de
-	ld a, l
-	sub e
-	ld l, a
-	ld a, h
-	sbc d
-	ld h, a
-
-	ld d,0
-	ld a,h
-	ld [ScreenPointerMS],a
-	ld a,l
-	ld [ScreenPointerLS],a
+	ld e,a
+	dec hl;index has not been dec yet so we gotta temp it
+	add hl,de
 	call WaitBlank
 	ld [hl],d;may have to change d val later
 	ret
@@ -473,13 +404,6 @@ loadTextInputWindow:
 	ld de,_SCRN1
 
 	call LoadBGMap
-	;setup screen pointer
-	ld hl,ScreenPointerMS
-	ld de,_SCRN0
-	ld [hl],d
-	inc hl
-	ld [hl],e
-
 
 	ret
 

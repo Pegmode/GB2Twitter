@@ -288,27 +288,6 @@ textInputHandling:
 
 sendTweet:
 	BREAKPOINT
-
-	ld hl,TweetBuffer
-	ld a,[rSC]
-	set 0,a;set to internal clock
-	ld [rSC],a
-.l1
-	ld a,[hl+]
-	cp 4 ;EOT
-	jr z,.exit
-	ld [rSB],a;load Payload
-	ld a,[rSC]
-	set 7,a
-	ld [rSC],a;START TRANSFER!
-	;wait!
-	rl a; 8 cyles each
-	rl a
-	rl a
-	rl a
-	BREAKPOINT
-	jp .l1
-.exit
 	ret
 
 ;arg b = char
@@ -336,7 +315,7 @@ putToTWDisplay:
 	jr nc,.c1;do we need newline?
 	ld e,13
 	ld a,0
-
+	
 .c1
 	inc a
 	ld [ScreenPointerCol],a
@@ -356,39 +335,12 @@ putToTWDisplay:
 	ret
 ;note does not dec index
 removeFromTWDisplay:
-	ld a,[ScreenPointerCol]
-	ld e,1
-	ld d,a
-	ld b,0
-	cp b
-
-	jr nz,.c1 ;if not on line edge
-	ld d,19
-	ld e,13
-
-.c1
-	ld a,d
-	dec a
+	ld hl,_SCRN0
+	ld a,[TweetPointerIndex]
 	ld d,0
-	ld [ScreenPointerCol],a
-	ld a,[ScreenPointerMS]
-	ld h,a
-	ld a,[ScreenPointerLS]
-	ld l,a
-
-	; hl -= de
-	ld a, l
-	sub e
-	ld l, a
-	ld a, h
-	sbc d
-	ld h, a
-
-	ld d,0
-	ld a,h
-	ld [ScreenPointerMS],a
-	ld a,l
-	ld [ScreenPointerLS],a
+	ld e,a
+	dec hl;index has not been dec yet so we gotta temp it
+	add hl,de
 	call WaitBlank
 	ld [hl],d;may have to change d val later
 	ret
