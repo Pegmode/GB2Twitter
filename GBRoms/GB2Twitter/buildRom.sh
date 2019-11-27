@@ -1,5 +1,5 @@
 #!/bin/bash
-PROJECTNAME="GB2TWITTER"
+PROJECTNAME="GB2Twitter"
 BGB="/home/dan/Documents/GBDev/Emu/bgb.exe" #RUN WITH WINE
 
 rgbasm -o ${PROJECTNAME}.obj main.asm

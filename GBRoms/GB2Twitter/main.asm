@@ -300,13 +300,25 @@ sendTweet:
 	jr z,.exit
 	ld [rSB],a;load Payload
 	ld a,[rSC]
-	set 7,a
+	ld a,%10000001
 	ld [rSC],a;START TRANSFER!
+.checkTransfer
+	ld a,[rSC]
+	and %10000000
+	jp nz,.checkTransfer
 	;wait!
 	rl a; 8 cyles each
 	rl a
 	rl a
 	rl a
+	rl a
+	rl a
+	rl a
+	rl a
+	rl a
+	rl a
+	rl a
+	BREAKPOINT
 	jp .l1
 .exit
 	ret
