@@ -1,19 +1,18 @@
 import serial,twitter
-import GB2TKeys
+import GB2TKeys #not included in git
 ser = serial.Serial('/dev/ttyUSB0')
-i = 1
 print('Waiting for Packet:')
 isWaiting = True
 packet = ""
 while isWaiting:
-    i += 1
     msg = ser.readline()
-    print(chr(int(msg[0:2].decode("utf-8"),16)))
+    #print(chr(int(msg[0:2].decode("utf-8"),16)))
     if (int(msg,16) == 4):
         break
     packet += (chr(int(msg[0:2].decode("utf-8"),16)))
     #print(packet)
-print("\nMessage:{}".format(packet))
-
 packet += "\nSent from my Game Boy!"
-# api = twitter.Api(consumer_key=consumer_key, consumer_secret=consumer_secret,access_token_key=access_key, access_token_secret=access_secret,input_encoding=encoding)
+print("\nMessage:{}".format(packet))
+api = twitter.Api(consumer_key=GB2TKeys.GB2T_consumer_key, consumer_secret=GB2TKeys.GB2T_consumer_secret,access_token_key=GB2TKeys.GB2T_access_token_key, access_token_secret=GB2TKeys.GB2T_access_token_secret)
+api.PostUpdate(packet)
+print("TWEET SENT!!")
