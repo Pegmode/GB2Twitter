@@ -1,4 +1,5 @@
 import serial,twitter
+import GB2TKeys
 ser = serial.Serial('/dev/ttyUSB0')
 i = 1
 print('Waiting for Packet:')
