@@ -299,7 +299,7 @@ sendTweet:
 	cp 4 ;EOT
 	jr z,.exit
 	ld [rSB],a;load Payload
-	ld a,[rSC]
+	BREAKPOINT
 	ld a,%10000001
 	ld [rSC],a;START TRANSFER!
 .checkTransfer
@@ -307,35 +307,24 @@ sendTweet:
 	and %10000000
 	jp nz,.checkTransfer
 	;wait!
-	rl a; 8 cyles each
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
 	BREAKPOINT
+	ld b,$FF
+.waitLoop
+	rlc a
+	dec b
+	jp nz,.waitLoop
 	jp .l1
 .exit
 .checkFTransfer
 	ld a,[rSC]
 	and %10000000
 	jp nz,.checkFTransfer
-	rl a; 8 cyles each
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
-	rl a
+	ld b,$FF
+.exitWait
+	rlc a
+	dec b
+	jp nz,.exitWait
+
 	ld a,4
 	ld [rSB],a;load termination Payload
 	ld a,[rSC]
