@@ -11,7 +11,7 @@ while isWaiting:
         break
     packet += (chr(int(msg[0:2].decode("utf-8"),16)))
     #print(packet)
-packet += "\nSent from my Game Boy!"
+packet += "\n\nSent from my Nindendo Game Boy"
 print("\nMessage:{}".format(packet))
 api = twitter.Api(consumer_key=GB2TKeys.GB2T_consumer_key, consumer_secret=GB2TKeys.GB2T_consumer_secret,access_token_key=GB2TKeys.GB2T_access_token_key, access_token_secret=GB2TKeys.GB2T_access_token_secret)
 api.PostUpdate(packet)
