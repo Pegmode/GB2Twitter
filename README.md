@@ -6,7 +6,7 @@ Project trying to interface GB link cable with RPi/Microcontroller for a Gameboy
 
 
 ###### Current Progress
-Only sends a tweet to twitter. Basically an overglorified GB serial terminal and simple python script.
+Only sends a tweet to twitter. Basically an overglorified GB serial terminal and simple python script. I may clean it up and add some more features later.
 
 
 ##### Requirements
@@ -17,6 +17,9 @@ Only sends a tweet to twitter. Basically an overglorified GB serial terminal and
 - Arduino Nano/Uno
 - Spliced Game Boy Link cable (See: notes for wiring)
 - Twitter Developer account and keys
+
+##### Topology 
+![Preview](/notes/GB2TwitterFlow.png)
 
 ##### Special Thanks
 - Brendan Gluth
