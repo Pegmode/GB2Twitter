@@ -2,7 +2,7 @@
 Project trying to interface GB link cable with RPi/Microcontroller for a Gameboy twitter client. Winning entry for the [University of Alberta Student Innovation Center idea fund 2019](https://www.ualberta.ca/student-innovation-centre/idea-fund).
 
 ![Preview](/notes/GB2Twitter.gif)
-![Preview](/master/notes/twitter.png)
+![Preview](/notes/twitter.png)
 
 
 
