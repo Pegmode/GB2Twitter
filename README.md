@@ -27,6 +27,7 @@ Only sends a tweet to twitter. Basically an overglorified GB serial terminal and
 ##### Special Thanks
 - Brendan Gluth
 - Taylor Knopp
+- Edward "DevEd" Whalen
 - University of Alberta Student innovation Center
 - "The Shack" at the University of Alberta
 - GB Dev Discord
