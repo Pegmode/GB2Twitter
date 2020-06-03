@@ -24,6 +24,9 @@ Only sends a tweet to twitter. Basically an overglorified GB serial terminal and
 ##### Topology 
 ![Preview](/notes/GB2TwitterFlow.png)
 
+#### Bugs
+- Removing a character at the edge of the screen bugs the screen
+
 ##### Special Thanks
 - Brendan Gluth
 - Taylor Knopp
