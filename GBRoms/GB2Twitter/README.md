@@ -1,4 +1,2 @@
-## LinkTest
-LinkTest is a ROM to debug Game Boy serial communication
-
-currently only sends and resieves one byte.
+## GB2Twitter
+Main GB2Twitter Game Boy ROM
