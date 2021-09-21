@@ -1,6 +1,10 @@
 # GB2Twitter
 Project trying to interface GB link cable with RPi/Microcontroller for a Gameboy twitter client. Winning entry for the [University of Alberta Student Innovation Center idea fund 2019](https://www.ualberta.ca/student-innovation-centre/idea-fund).
 
+[Demo Video](https://www.youtube.com/watch?v=k0U-M86C37E)
+
+[python-twitter](https://github.com/bear/python-twitter)
+
 ![Preview](/notes/GB2Twitter.gif)
 ![Preview](/notes/twitter.png)
 
