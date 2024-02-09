@@ -8,7 +8,7 @@ Project trying to interface GB link cable with RPi/Microcontroller for a Gameboy
 ![Preview](/notes/GB2Twitter.gif)
 ![Preview](/notes/twitter.png)
 
-
+<img src="notes/79959290_10216417212685277_7443546913766375424_n.jpg" width="500"/>
 
 
 
